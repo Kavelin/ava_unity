@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Drone Kit Web</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script defer src="Scripts/unity-loader.js"></script>
+  <script defer src="Scripts/websocket-agent.js"></script>
+  <script defer src="Scripts/agent-ui.js"></script>
+</head>
+
+<body>
+  <div id="unity-container" class="unity-desktop">
+
+    <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+
+    <div id="unity-warning"></div>
+
+    <div id="unity-footer" style="display:none;">
+      <div id="unity-logo-title-footer"></div>
+      <div id="unity-fullscreen-button"></div>
+      <div id="unity-build-title">dronekittest</div>
+    </div>
+
+    <div id="agent-ui">
+      <div class="agent-header">
+        <div class="agent-title">Agent</div>
+        <div id="ws-status" class="agent-status">connecting...</div>
+      </div>
+
+      <pre id="cmd-output" class="agent-output"></pre>
+
+      <input
+        id="cmd-input"
+        class="agent-input"
+        type="text"
+        placeholder="Type a command..."
+        value="Take off to 5 meters"
+      />
+
+      <button id="send-cmd" class="agent-button">Send</button>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+#unity-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#unity-canvas {
+  max-width: 960px;
+  max-height: 600px;
+}
+
+#agent-ui {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px;
+  z-index: 9999;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  font-family: sans-serif;
+}
+
+.agent-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.agent-title {
+  font-weight: 600;
+}
+
+.agent-status {
+  font-size: 12px;
+  color: #666;
+}
+
+.agent-output {
+  background: #f6f6f6;
+  padding: 8px;
+  height: 140px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+
+.agent-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  margin-bottom: 6px;
+}
+
+.agent-button {
+  width: 100%;
+  padding: 6px;
+  cursor: pointer;
+}
