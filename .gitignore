@@ -1,29 +1,18 @@
-# Unity generated files
 /Library/
 [Ll]ogs/
 [Oo]bj/
 [Cc]onversionSettings.asset
-
-# Visual Studio/IDE files
 .vs/
 .vscode/
 *.csproj
 *.sln
 *.user
 *.VC.db
-
-# Local user-specific settings
 [Uu]ser[Ss]ettings/
-
-# Generated asset database
 Asset*Store-*
 com.unity.*
-
-# Temp files
 [Tt]emp/
 *.tmp
-
-# Python virtual environment and cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -47,18 +36,8 @@ wheels/
 .installed.cfg
 *.egg
 pyvenv.cfg
-
-# OS-specific files
 .DS_Store
 Thumbs.db
-
-# Editor swap files
 *.swp
 *.swo
 *~
-
-# Large binary files (if not using Git LFS)
-*.obj
-*.fbx
-*.blend
-*.unitypackage
