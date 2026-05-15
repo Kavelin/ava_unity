@@ -8,7 +8,7 @@ using TMPro;
 #if UNITY_WEBGL
 using NativeWebSocket;
 #endif
-public class WSSClient : MonoBehaviour
+public partial class WSSClient : MonoBehaviour
 {
     public GameObject drone;
     private string serverIp = "127.0.0.1";
@@ -18,6 +18,7 @@ public class WSSClient : MonoBehaviour
 
 #if UNITY_WEBGL
     WebSocket websocket;
+    MapboxDroneController _mapCtrl;
 
     async void Start()
     {
@@ -31,7 +32,10 @@ public class WSSClient : MonoBehaviour
         try
         {
             await websocket.Connect();
-            Debug.Log("Connected to drone data stream");
+            Debug.Log("WSSClient: Connected to drone data stream");
+            // Cache Mapbox controller once at startup
+            _mapCtrl = FindObjectOfType<MapboxDroneController>();
+            if (_mapCtrl == null) Debug.LogWarning("WSSClient: MapboxDroneController not found in scene at Start.");
         }
         catch (Exception e)
         {
@@ -48,41 +52,44 @@ public class WSSClient : MonoBehaviour
         }
     }
 
-    void ParseAndMove(string data) {
-        try {
+    void ParseAndMove(string data)
+    {
+        try
+        {
             if (drone == null)
             {
                 Debug.LogError("ERROR: Drone GameObject is not assigned!");
                 return;
             }
 
-            string[] v = data.Split(' ');
-            if (v.Length < 6) 
+            // Try JSON first
+            try
             {
-                Debug.LogWarning($"Incomplete data received ({v.Length} fields): {data}");
+                var obj = JsonUtility.FromJson<SimpleGps>(data);
+                if (obj != null && !double.IsNaN(obj.lat) && !double.IsNaN(obj.lon))
+                {
+                    CallMapController(obj.lat, obj.lon, obj.alt, obj.roll, obj.pitch, obj.yaw);
+                    return;
+                }
+            }
+            catch (Exception) { }
+
+            // Try space-separated: lat lon alt [roll pitch yaw]
+            string[] parts = data.Split(' ');
+            if (parts.Length >= 3 && double.TryParse(parts[0], out double a0) && double.TryParse(parts[1], out double a1) && double.TryParse(parts[2], out double a2))
+            {
+                float roll = parts.Length > 3 && float.TryParse(parts[3], out float r) ? r : 0f;
+                float pitch = parts.Length > 4 && float.TryParse(parts[4], out float p) ? p : 0f;
+                float yaw = parts.Length > 5 && float.TryParse(parts[5], out float yv) ? yv : 0f;
+                CallMapController(a0, a1, a2, roll, pitch, yaw);
                 return;
             }
 
-            float x = float.Parse(v[0]) / 100f;
-            float y = float.Parse(v[1]) / 100f;
-            float z = float.Parse(v[2]) / 100f;
-            float roll = float.Parse(v[3]);
-            float pitch = float.Parse(v[4]);
-            float yaw = float.Parse(v[5]);
-
-            // Debug first few updates
-            if (Time.frameCount % 60 == 0) // Log every 60 frames at 60 FPS = 1 second
-            {
-                Debug.Log($"[Drone] Pos: ({x:F2}, {y:F2}, {z:F2}) Rot: ({roll:F2}°, {pitch:F2}°, {yaw:F2}°)");
-            }
-
-            drone.transform.position = new Vector3(x, z, y); // swap y and z for unity coordinate system
-            // Invert pitch to match WebGL/Unity coordinate convention when device reports nose-down as positive
-            drone.transform.rotation = Quaternion.Euler(-pitch, yaw, roll);
-        } 
-        catch (Exception e) 
-        { 
-            Debug.LogError($"Error parsing drone data: {e.Message}\nData: {data}"); 
+            Debug.LogWarning($"Unrecognized drone data format: {data}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error parsing drone data: {e.Message}\nData: {data}");
         }
     }
 
@@ -92,4 +99,42 @@ public class WSSClient : MonoBehaviour
 
     }
 #endif
+}
+
+[System.Serializable]
+public class SimpleGps
+{
+    public double lat = double.NaN;
+    public double lon = double.NaN;
+    public double alt = 0.0;
+    public float roll = 0f;
+    public float pitch = 0f;
+    public float yaw = 0f;
+}
+
+partial class WSSClient
+{
+    void CallMapController(double lat, double lon, double alt, float roll, float pitch, float yaw)
+    {
+        try
+        {
+            if (_mapCtrl == null)
+            {
+                _mapCtrl = FindObjectOfType<MapboxDroneController>();
+            }
+
+            if (_mapCtrl != null)
+            {
+                _mapCtrl.ApplyGpsFix(lat, lon, alt, roll, pitch, yaw);
+            }
+            else
+            {
+                Debug.LogWarning("WSSClient: MapboxDroneController not found when trying to apply GPS fix.");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error calling MapboxDroneController: " + e.Message);
+        }
+    }
 }

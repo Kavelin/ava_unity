@@ -1,6 +1,7 @@
 
 import asyncio
 import math
+import os
 from pathlib import Path
 from typing import Set
 import mimetypes
@@ -22,7 +23,7 @@ except Exception:
 
 from dronekit import connect
 
-DRONEKIT_CONNECTION_STRING = 'tcp:127.0.0.1:5763'
+DRONEKIT_CONNECTION_STRING = os.getenv("DRONEKIT_CONNECTION_STRING", "tcp:127.0.0.1:5760")
 DRONEKIT_BAUD = 57600
 DRONEKIT_RATE = 60
 WEBSOCKET_BROADCAST_INTERVAL = 1 / 60 # 60hz seems to be stable

@@ -13,3 +13,8 @@ pip install -r requirements.txt
 python server.py
 ```
 
+## Mapbox Access Token
+
+Set your Mapbox token in `Assets/Resources/Mapbox/MapboxConfiguration.txt` by replacing
+`YOUR_MAPBOX_ACCESS_TOKEN` with your own access token. Do not commit real tokens.
+
